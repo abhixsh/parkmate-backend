@@ -56,6 +56,14 @@ public class ParkingSpot {
     public void setAvailability(boolean availability) {
         this.availability = availability;
     }
+
+    public void setAvailable(boolean aBoolean) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public boolean isAvailable() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
     
 
