@@ -121,8 +121,19 @@ public class UserServlet extends HttpServlet {
                 session.setAttribute("userId", user.getId());
                 session.setAttribute("userEmail", user.getEmail());
 
-                String successJson = gson.toJson(new JsonResponse("Login successful", true, user.getId()));
-                sendResponse(response, HttpServletResponse.SC_OK, successJson);
+                // Create JSON with user details
+                JsonObject userJson = new JsonObject();
+                userJson.addProperty("id", user.getId());
+                userJson.addProperty("fullName", user.getFullName());
+                userJson.addProperty("email", user.getEmail());
+                userJson.addProperty("phoneNumber", user.getPhoneNumber());
+
+                JsonObject responseJson = new JsonObject();
+                responseJson.addProperty("message", "Login successful");
+                responseJson.addProperty("success", true);
+                responseJson.add("user", userJson);
+
+                sendResponse(response, HttpServletResponse.SC_OK, gson.toJson(responseJson));
             } else {
                 String errorJson = gson.toJson(new JsonResponse("Invalid email or password", false, null));
                 sendResponse(response, HttpServletResponse.SC_UNAUTHORIZED, errorJson);
