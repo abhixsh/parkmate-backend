@@ -1,40 +1,32 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.parking.dao;
 
 import com.parking.model.ParkingSpot;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.parking.util.DbConnector;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Handles database operations for Parking Spots.
- * Author: Abishek
- */
 public class ParkingSpotDao {
     private Connection connection;
 
-    public ParkingSpotDao(Connection connection) {
-        this.connection = connection;
+    public ParkingSpotDao() {
+        DbConnector dbConnector = new DbConnector();
+        this.connection = dbConnector.getConnection();
     }
 
     // Add a new parking spot
-    public boolean addParkingSpot(ParkingSpot parkingSpot) {
-        String query = "INSERT INTO parking_spots (spot_name, location, spot_type, availability) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, parkingSpot.getSpotName());
-            statement.setString(2, parkingSpot.getLocation());
-            statement.setString(3, parkingSpot.getSpotType());
-            statement.setBoolean(4, parkingSpot.isAvailable());
+    public boolean addParkingSpot(ParkingSpot spot) {
+        String query = "INSERT INTO ParkingSpots (name, location, type, hourlyRate, isAvailable) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, spot.getName());
+            stmt.setString(2, spot.getLocation());
+            stmt.setString(3, spot.getType());
+            stmt.setDouble(4, spot.getHourlyRate());
+            stmt.setBoolean(5, spot.isAvailable());
 
-            int rowsInserted = statement.executeUpdate();
-            return rowsInserted > 0;
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -43,31 +35,39 @@ public class ParkingSpotDao {
 
     // Fetch all parking spots
     public List<ParkingSpot> getAllParkingSpots() {
-        List<ParkingSpot> parkingSpots = new ArrayList<>();
-        String query = "SELECT * FROM parking_spots";
-        try (PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
-
+        List<ParkingSpot> spots = new ArrayList<>();
+        String query = "SELECT * FROM ParkingSpots";
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet resultSet = stmt.executeQuery()) {
             while (resultSet.next()) {
-                ParkingSpot parkingSpot = mapResultSetToParkingSpot(resultSet);
-                parkingSpots.add(parkingSpot);
+                spots.add(new ParkingSpot(
+                    resultSet.getInt("id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("location"),
+                    resultSet.getString("type"),
+                    resultSet.getDouble("hourlyRate"),
+                    resultSet.getBoolean("isAvailable")
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return parkingSpots;
+        return spots;
     }
-
-    // Fetch a parking spot by ID
     public ParkingSpot getParkingSpotById(int id) {
-        String query = "SELECT * FROM parking_spots WHERE id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, id);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return mapResultSetToParkingSpot(resultSet);
-                }
+        String query = "SELECT * FROM ParkingSpots WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                return new ParkingSpot(
+                    resultSet.getInt("id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("location"),
+                    resultSet.getString("type"),
+                    resultSet.getDouble("hourlyRate"),
+                    resultSet.getBoolean("isAvailable")
+                );
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -75,91 +75,33 @@ public class ParkingSpotDao {
         return null;
     }
 
-    // Update a parking spot
-    public boolean updateParkingSpot(ParkingSpot parkingSpot) {
-        String query = "UPDATE parking_spots SET spot_name = ?, location = ?, spot_type = ?, availability = ? WHERE id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, parkingSpot.getSpotName());
-            statement.setString(2, parkingSpot.getLocation());
-            statement.setString(3, parkingSpot.getSpotType());
-            statement.setBoolean(4, parkingSpot.isAvailable());
-            statement.setInt(5, parkingSpot.getId());
+    public boolean updateParkingSpot(ParkingSpot spot) {
+        String query = "UPDATE ParkingSpots SET name = ?, location = ?, type = ?, hourlyRate = ?, isAvailable = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, spot.getName());
+            stmt.setString(2, spot.getLocation());
+            stmt.setString(3, spot.getType());
+            stmt.setDouble(4, spot.getHourlyRate());
+            stmt.setBoolean(5, spot.isAvailable());
+            stmt.setInt(6, spot.getId());
 
-            int rowsUpdated = statement.executeUpdate();
-            return rowsUpdated > 0;
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    // Delete a parking spot by ID
     public boolean deleteParkingSpot(int id) {
-        String query = "DELETE FROM parking_spots WHERE id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, id);
-
-            int rowsDeleted = statement.executeUpdate();
-            return rowsDeleted > 0;
+        String query = "DELETE FROM ParkingSpots WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
-    }
-
-    // Count all parking spots
-    public int countAllParkingSpots() {
-        String query = "SELECT COUNT(*) AS total FROM parking_spots";
-        try (PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            if (resultSet.next()) {
-                return resultSet.getInt("total");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    // Count available parking spots
-    public int countAvailableParkingSpots() {
-        String query = "SELECT COUNT(*) AS total FROM parking_spots WHERE availability = true";
-        try (PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            if (resultSet.next()) {
-                return resultSet.getInt("total");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    // Count booked parking spots
-    public int countBookedParkingSpots() {
-        String query = "SELECT COUNT(*) AS total FROM parking_spots WHERE availability = false";
-        try (PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            if (resultSet.next()) {
-                return resultSet.getInt("total");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    // Utility method to map ResultSet to ParkingSpot object
-    private ParkingSpot mapResultSetToParkingSpot(ResultSet resultSet) throws SQLException {
-        ParkingSpot parkingSpot = new ParkingSpot();
-        parkingSpot.setId(resultSet.getInt("id"));
-        parkingSpot.setSpotName(resultSet.getString("spot_name"));
-        parkingSpot.setLocation(resultSet.getString("location"));
-        parkingSpot.setSpotType(resultSet.getString("spot_type"));
-        parkingSpot.setAvailable(resultSet.getBoolean("availability"));
-        return parkingSpot;
     }
 }

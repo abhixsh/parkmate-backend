@@ -1,22 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.parking.model;
 
-/**
- *
- * @author Abishek
- */
 public class ParkingSpot {
-
     private int id;
-    private String spotName;
+    private String name;
     private String location;
-    private String spotType; // Compact or Large
-    private boolean availability;
+    private String type;
+    private double hourlyRate;
+    private boolean isAvailable;
 
+    // Constructors
+    public ParkingSpot() {}
+
+    public ParkingSpot(int id, String name, String location, String type, double hourlyRate, boolean isAvailable) {
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.type = type;
+        this.hourlyRate = hourlyRate;
+        this.isAvailable = isAvailable;
+    }
+
+    // Getters and setters
     public int getId() {
         return id;
     }
@@ -25,12 +29,12 @@ public class ParkingSpot {
         this.id = id;
     }
 
-    public String getSpotName() {
-        return spotName;
+    public String getName() {
+        return name;
     }
 
-    public void setSpotName(String spotName) {
-        this.spotName = spotName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getLocation() {
@@ -41,30 +45,27 @@ public class ParkingSpot {
         this.location = location;
     }
 
-    public String getSpotType() {
-        return spotType;
+    public String getType() {
+        return type;
     }
 
-    public void setSpotType(String spotType) {
-        this.spotType = spotType;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public boolean isAvailability() {
-        return availability;
+    public double getHourlyRate() {
+        return hourlyRate;
     }
 
-    public void setAvailability(boolean availability) {
-        this.availability = availability;
-    }
-
-    public void setAvailable(boolean aBoolean) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setHourlyRate(double hourlyRate) {
+        this.hourlyRate = hourlyRate;
     }
 
     public boolean isAvailable() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return isAvailable;
     }
-    
-    
 
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
 }

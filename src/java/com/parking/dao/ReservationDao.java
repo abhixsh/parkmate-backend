@@ -1,60 +1,86 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.parking.dao;
 
 import com.parking.model.Reservation;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.parking.util.DbConnector;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Handles database operations for Reservations.
- * Author: Abishek
- */
 public class ReservationDao {
+
     private Connection connection;
 
-    public ReservationDao(Connection connection) {
-        this.connection = connection;
+    public ReservationDao() {
+        DbConnector dbConnector = new DbConnector();
+        this.connection = dbConnector.getConnection();
     }
 
-    // Add a new reservation to the database
+    // CREATE: Add a new reservation
     public boolean addReservation(Reservation reservation) {
-        String query = "INSERT INTO reservations (user_id, reservation_date, vehicle_type, vehicle_plate_number, start_time, end_time, parking_spot_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, reservation.getUserId());
-            statement.setDate(2, new java.sql.Date(reservation.getReservationDate().getTime()));
-            statement.setString(3, reservation.getVehicleType());
-            statement.setString(4, reservation.getVehiclePlateNumber());
-            statement.setString(5, reservation.getStartTime());
-            statement.setString(6, reservation.getEndTime());
-            statement.setInt(7, reservation.getParkingSpotId());
-            statement.setString(8, reservation.getStatus());
+        String query = "INSERT INTO Reservations (userID, parkingSpotID, fullName, email, vehicleType, vehiclePlateNumber, reservationDate, startTime, endTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, reservation.getUserId());
+            stmt.setInt(2, reservation.getParkingSpotId());
+            stmt.setString(3, reservation.getFullName());
+            stmt.setString(4, reservation.getEmail());
+            stmt.setString(5, reservation.getVehicleType());
+            stmt.setString(6, reservation.getVehiclePlateNumber());
+            stmt.setDate(7, reservation.getReservationDate());
+            stmt.setTimestamp(8, reservation.getStartTime());
+            stmt.setTimestamp(9, reservation.getEndTime());
 
-            int rowsInserted = statement.executeUpdate();
-            return rowsInserted > 0;
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    // Fetch all reservations
+    // READ: Get a reservation by ID
+    public Reservation getReservationById(int id) {
+        String query = "SELECT * FROM Reservations WHERE reservationID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                return new Reservation(
+                    resultSet.getInt("userID"),
+                    resultSet.getString("fullName"),
+                    resultSet.getString("email"),
+                    resultSet.getInt("parkingSpotID"),
+                    resultSet.getString("vehicleType"),
+                    resultSet.getString("vehiclePlateNumber"),
+                    resultSet.getDate("reservationDate"),
+                    resultSet.getTimestamp("startTime"),
+                    resultSet.getTimestamp("endTime")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // READ: Get all reservations
     public List<Reservation> getAllReservations() {
         List<Reservation> reservations = new ArrayList<>();
-        String query = "SELECT * FROM reservations";
-        try (PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
-
+        String query = "SELECT * FROM Reservations";
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet resultSet = stmt.executeQuery(query);
             while (resultSet.next()) {
-                Reservation reservation = mapResultSetToReservation(resultSet);
-                reservations.add(reservation);
+                reservations.add(new Reservation(
+                    resultSet.getInt("userID"),
+                    resultSet.getString("fullName"),
+                    resultSet.getString("email"),
+                    resultSet.getInt("parkingSpotID"),
+                    resultSet.getString("vehicleType"),
+                    resultSet.getString("vehiclePlateNumber"),
+                    resultSet.getDate("reservationDate"),
+                    resultSet.getTimestamp("startTime"),
+                    resultSet.getTimestamp("endTime")
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -62,72 +88,36 @@ public class ReservationDao {
         return reservations;
     }
 
-    // Fetch reservations by User ID
-    public List<Reservation> getReservationsByUserId(int userId) {
-        List<Reservation> reservations = new ArrayList<>();
-        String query = "SELECT * FROM reservations WHERE user_id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, userId);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    Reservation reservation = mapResultSetToReservation(resultSet);
-                    reservations.add(reservation);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return reservations;
-    }
-
-    // Update a reservation
+    // UPDATE: Update a reservation
     public boolean updateReservation(Reservation reservation) {
-        String query = "UPDATE reservations SET reservation_date = ?, vehicle_type = ?, vehicle_plate_number = ?, start_time = ?, end_time = ?, parking_spot_id = ?, status = ? WHERE id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setDate(1, new java.sql.Date(reservation.getReservationDate().getTime()));
-            statement.setString(2, reservation.getVehicleType());
-            statement.setString(3, reservation.getVehiclePlateNumber());
-            statement.setString(4, reservation.getStartTime());
-            statement.setString(5, reservation.getEndTime());
-            statement.setInt(6, reservation.getParkingSpotId());
-            statement.setString(7, reservation.getStatus());
-            statement.setInt(8, reservation.getId());
+        String query = "UPDATE Reservations SET fullName = ?, email = ?, vehicleType = ?, vehiclePlateNumber = ?, startTime = ?, endTime = ? WHERE reservationID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, reservation.getFullName());
+            stmt.setString(2, reservation.getEmail());
+            stmt.setString(3, reservation.getVehicleType());
+            stmt.setString(4, reservation.getVehiclePlateNumber());
+            stmt.setTimestamp(5, reservation.getStartTime());
+            stmt.setTimestamp(6, reservation.getEndTime());
+            stmt.setInt(7, reservation.getReservationId());
 
-            int rowsUpdated = statement.executeUpdate();
-            return rowsUpdated > 0;
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
-    // Delete a reservation by ID
+    // DELETE: Delete a reservation by ID
     public boolean deleteReservation(int id) {
-        String query = "DELETE FROM reservations WHERE id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, id);
-
-            int rowsDeleted = statement.executeUpdate();
-            return rowsDeleted > 0;
+        String query = "DELETE FROM Reservations WHERE reservationID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
-    }
-
-    // Utility method to map ResultSet to Reservation object
-    private Reservation mapResultSetToReservation(ResultSet resultSet) throws SQLException {
-        Reservation reservation = new Reservation();
-        reservation.setId(resultSet.getInt("id"));
-        reservation.setUserId(resultSet.getInt("user_id"));
-        reservation.setReservationDate(resultSet.getDate("reservation_date"));
-        reservation.setVehicleType(resultSet.getString("vehicle_type"));
-        reservation.setVehiclePlateNumber(resultSet.getString("vehicle_plate_number"));
-        reservation.setStartTime(resultSet.getString("start_time"));
-        reservation.setEndTime(resultSet.getString("end_time"));
-        reservation.setParkingSpotId(resultSet.getInt("parking_spot_id"));
-        reservation.setStatus(resultSet.getString("status"));
-        return reservation;
+        return false;
     }
 }

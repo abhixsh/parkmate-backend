@@ -37,12 +37,13 @@
 
     <servlet-mapping>
         <servlet-name>ReservationServlet</servlet-name>
-        <url-pattern>/reservation</url-pattern>
+        <url-pattern>/reservation/*</url-pattern>
     </servlet-mapping>
+
 
     <servlet-mapping>
         <servlet-name>ParkingSpotServlet</servlet-name>
-        <url-pattern>/parkingSpot</url-pattern>
+        <url-pattern>/parkingSpot/*</url-pattern>
     </servlet-mapping>
 
     <!-- Session Timeout Configuration -->
