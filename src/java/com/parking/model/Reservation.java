@@ -4,33 +4,30 @@ import java.sql.Date;
 import java.sql.Timestamp;
 
 public class Reservation {
-
     private int reservationId;
-    private int userId;
     private String fullName;
     private String email;
-    private int parkingSpotId;
     private String vehicleType;
     private String vehiclePlateNumber;
-    private Date reservationDate;
-    private Timestamp startTime;
-    private Timestamp endTime;
+    private Integer reservationDate;
+    private Integer startTime;
+    private Integer endTime;
+    private String spotName;
 
-    // Constructor
     public Reservation() {}
 
-    public Reservation(int userId, String fullName, String email, int parkingSpotId, 
-                       String vehicleType, String vehiclePlateNumber, 
-                       Date reservationDate, Timestamp startTime, Timestamp endTime) {
-        this.userId = userId;
+    public Reservation(int reservationId, String fullName, String email, String vehicleType, 
+                       String vehiclePlateNumber, Integer reservationDate, 
+                       Integer startTime, Integer endTime, String spotName) {
+        this.reservationId = reservationId;
         this.fullName = fullName;
         this.email = email;
-        this.parkingSpotId = parkingSpotId;
         this.vehicleType = vehicleType;
         this.vehiclePlateNumber = vehiclePlateNumber;
         this.reservationDate = reservationDate;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.spotName = spotName;
     }
 
     // Getters and Setters
@@ -40,14 +37,6 @@ public class Reservation {
 
     public void setReservationId(int reservationId) {
         this.reservationId = reservationId;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
     }
 
     public String getFullName() {
@@ -66,14 +55,6 @@ public class Reservation {
         this.email = email;
     }
 
-    public int getParkingSpotId() {
-        return parkingSpotId;
-    }
-
-    public void setParkingSpotId(int parkingSpotId) {
-        this.parkingSpotId = parkingSpotId;
-    }
-
     public String getVehicleType() {
         return vehicleType;
     }
@@ -90,27 +71,35 @@ public class Reservation {
         this.vehiclePlateNumber = vehiclePlateNumber;
     }
 
-    public Date getReservationDate() {
+    public Integer getReservationDate() {
         return reservationDate;
     }
 
-    public void setReservationDate(Date reservationDate) {
+    public void setReservationDate(Integer reservationDate) {
         this.reservationDate = reservationDate;
     }
 
-    public Timestamp getStartTime() {
+    public Integer getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Timestamp startTime) {
+    public void setStartTime(Integer startTime) {
         this.startTime = startTime;
     }
 
-    public Timestamp getEndTime() {
+    public Integer getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Timestamp endTime) {
+    public void setEndTime(Integer endTime) {
         this.endTime = endTime;
+    }
+
+    public String getSpotName() {
+        return spotName;
+    }
+
+    public void setSpotName(String spotName) {
+        this.spotName = spotName;
     }
 }
