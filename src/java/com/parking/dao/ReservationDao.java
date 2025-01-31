@@ -117,4 +117,30 @@ public class ReservationDao {
         }
         return false;
     }
+    // READ: Get reservations by email
+public List<Reservation> getReservationsByEmail(String email) {
+    List<Reservation> reservations = new ArrayList<>();
+    String query = "SELECT * FROM reservations WHERE email = ?";
+    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        stmt.setString(1, email);
+        ResultSet resultSet = stmt.executeQuery();
+        while (resultSet.next()) {
+            reservations.add(new Reservation(
+                resultSet.getInt("reservationID"),
+                resultSet.getString("fullName"),
+                resultSet.getString("email"),
+                resultSet.getString("vehicleType"),
+                resultSet.getString("vehiclePlateNumber"),
+                resultSet.getLong("reservationDate"),
+                resultSet.getLong("startTime"),
+                resultSet.getLong("endTime"),
+                resultSet.getString("spotName")
+            ));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return reservations;
+}
+
 }

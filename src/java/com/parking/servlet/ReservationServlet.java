@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/parkmate/reservation/*")
 public class ReservationServlet extends HttpServlet {
@@ -39,7 +40,23 @@ public class ReservationServlet extends HttpServlet {
         String pathInfo = request.getPathInfo();
         response.setContentType("application/json");
 
-        if (pathInfo == null || pathInfo.equals("/")) {
+        if (pathInfo != null && pathInfo.startsWith("/email/")) {
+            // Fetch reservations based on email
+            String email = pathInfo.substring(7);  // Extract email from URL
+            try {
+                List<Reservation> reservations = reservationDao.getReservationsByEmail(email);
+                if (!reservations.isEmpty()) {
+                    response.getWriter().write(gson.toJson(reservations));
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write(gson.toJson("No reservations found for this email"));
+                }
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write(gson.toJson("Failed to fetch reservations by email"));
+            }
+        } else if (pathInfo == null || pathInfo.equals("/")) {
+            // Fetch all reservations
             try {
                 response.getWriter().write(gson.toJson(reservationDao.getAllReservations()));
             } catch (Exception e) {
