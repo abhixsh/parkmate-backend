@@ -1,24 +1,21 @@
 package com.parking.model;
 
-import java.sql.Date;
-import java.sql.Timestamp;
-
 public class Reservation {
     private int reservationId;
     private String fullName;
     private String email;
     private String vehicleType;
     private String vehiclePlateNumber;
-    private Integer reservationDate;
-    private Integer startTime;
-    private Integer endTime;
+    private Long reservationDate;  // Changed from Integer to Long
+    private Long startTime;       // Changed from Integer to Long
+    private Long endTime;         // Changed from Integer to Long
     private String spotName;
 
     public Reservation() {}
 
     public Reservation(int reservationId, String fullName, String email, String vehicleType, 
-                       String vehiclePlateNumber, Integer reservationDate, 
-                       Integer startTime, Integer endTime, String spotName) {
+                       String vehiclePlateNumber, Long reservationDate, 
+                       Long startTime, Long endTime, String spotName) {
         this.reservationId = reservationId;
         this.fullName = fullName;
         this.email = email;
@@ -71,27 +68,27 @@ public class Reservation {
         this.vehiclePlateNumber = vehiclePlateNumber;
     }
 
-    public Integer getReservationDate() {
+    public Long getReservationDate() {
         return reservationDate;
     }
 
-    public void setReservationDate(Integer reservationDate) {
+    public void setReservationDate(Long reservationDate) {
         this.reservationDate = reservationDate;
     }
 
-    public Integer getStartTime() {
+    public Long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Integer startTime) {
+    public void setStartTime(Long startTime) {
         this.startTime = startTime;
     }
 
-    public Integer getEndTime() {
+    public Long getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Integer endTime) {
+    public void setEndTime(Long endTime) {
         this.endTime = endTime;
     }
 

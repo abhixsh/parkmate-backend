@@ -23,9 +23,9 @@ public class ReservationDao {
             stmt.setString(2, reservation.getEmail());
             stmt.setString(3, reservation.getVehicleType());
             stmt.setString(4, reservation.getVehiclePlateNumber());
-            stmt.setInt(5, reservation.getReservationDate());
-            stmt.setInt(6, reservation.getStartTime());
-            stmt.setInt(7, reservation.getEndTime());
+            stmt.setLong(5, reservation.getReservationDate());  // Changed from setInt to setLong
+            stmt.setLong(6, reservation.getStartTime());        // Changed from setInt to setLong
+            stmt.setLong(7, reservation.getEndTime());          // Changed from setInt to setLong
             stmt.setString(8, reservation.getSpotName());
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -48,9 +48,9 @@ public class ReservationDao {
                     resultSet.getString("email"),
                     resultSet.getString("vehicleType"),
                     resultSet.getString("vehiclePlateNumber"),
-                    resultSet.getInt("reservationDate"),
-                    resultSet.getInt("startTime"),
-                    resultSet.getInt("endTime"),
+                    resultSet.getLong("reservationDate"),  // Changed from getInt to getLong
+                    resultSet.getLong("startTime"),        // Changed from getInt to getLong
+                    resultSet.getLong("endTime"),          // Changed from getInt to getLong
                     resultSet.getString("spotName")
                 );
             }
@@ -73,9 +73,9 @@ public class ReservationDao {
                     resultSet.getString("email"),
                     resultSet.getString("vehicleType"),
                     resultSet.getString("vehiclePlateNumber"),
-                    resultSet.getInt("reservationDate"),
-                    resultSet.getInt("startTime"),
-                    resultSet.getInt("endTime"),
+                    resultSet.getLong("reservationDate"),  // Changed from getInt to getLong
+                    resultSet.getLong("startTime"),        // Changed from getInt to getLong
+                    resultSet.getLong("endTime"),          // Changed from getInt to getLong
                     resultSet.getString("spotName")
                 ));
             }
@@ -93,8 +93,8 @@ public class ReservationDao {
             stmt.setString(2, reservation.getEmail());
             stmt.setString(3, reservation.getVehicleType());
             stmt.setString(4, reservation.getVehiclePlateNumber());
-            stmt.setInt(5, reservation.getStartTime());
-            stmt.setInt(6, reservation.getEndTime());
+            stmt.setLong(5, reservation.getStartTime());  // Changed from setInt to setLong
+            stmt.setLong(6, reservation.getEndTime());    // Changed from setInt to setLong
             stmt.setString(7, reservation.getSpotName());
             stmt.setInt(8, reservation.getReservationId());
             int rowsAffected = stmt.executeUpdate();
