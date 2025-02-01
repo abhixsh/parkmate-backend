@@ -11,13 +11,11 @@ public class AdminDao {
 
     private Connection connection;
 
-    // Constructor: Initializes connection using DbConnector
     public AdminDao() {
         DbConnector dbConnector = new DbConnector();
         this.connection = dbConnector.getConnection();
     }
 
-    // CREATE: Register a new admin
     public boolean registerAdmin(Admin admin) {
         String query = "INSERT INTO admins (email, password, role) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -38,7 +36,6 @@ public class AdminDao {
         }
     }
 
-    // READ: Get all admins
     public List<Admin> getAllAdmins() {
         String query = "SELECT * FROM admins";
         List<Admin> admins = new ArrayList<>();
@@ -53,7 +50,6 @@ public class AdminDao {
         return admins;
     }
 
-    // READ: Get admin by ID
     public Admin getAdminById(int adminId) {
         String query = "SELECT * FROM admins WHERE admin_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -68,7 +64,6 @@ public class AdminDao {
         return null;
     }
 
-    // READ: Get admin by email
     public Admin getAdminByEmail(String email) {
         String query = "SELECT * FROM admins WHERE email = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -83,7 +78,6 @@ public class AdminDao {
         return null;
     }
 
-    // UPDATE: Update admin details
     public boolean updateAdmin(Admin admin) {
         String query = "UPDATE admins SET email = ?, password = ?, role = ? WHERE admin_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -99,7 +93,6 @@ public class AdminDao {
         return false;
     }
 
-    // DELETE: Remove an admin
     public boolean deleteAdmin(int adminId) {
         String query = "DELETE FROM admins WHERE admin_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -112,7 +105,6 @@ public class AdminDao {
         return false;
     }
 
-    // Helper method to extract an Admin object from a ResultSet
     private Admin extractAdminFromResultSet(ResultSet resultSet) throws SQLException {
         Admin admin = new Admin();
         admin.setAdminId(resultSet.getInt("admin_id"));
@@ -122,12 +114,11 @@ public class AdminDao {
         return admin;
     }
 
-    // Validate admin login
     public Admin validateLogin(String email, String password) {
         String query = "SELECT * FROM admins WHERE email = ? AND password = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
-            stmt.setString(2, password);  // In production, use proper password hashing
+            stmt.setString(2, password);  
 
             ResultSet resultSet = stmt.executeQuery();
             if (resultSet.next()) {

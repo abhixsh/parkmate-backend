@@ -1,4 +1,15 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package com.parking.model;
+
+/**
+ *
+ * @author Abishek
+ */
 
 public class Reservation {
     private int reservationId;
@@ -6,9 +17,9 @@ public class Reservation {
     private String email;
     private String vehicleType;
     private String vehiclePlateNumber;
-    private Long reservationDate;  // Changed from Integer to Long
-    private Long startTime;       // Changed from Integer to Long
-    private Long endTime;         // Changed from Integer to Long
+    private Long reservationDate;  
+    private Long startTime;       
+    private Long endTime;         
     private String spotName;
 
     public Reservation() {}
@@ -27,7 +38,6 @@ public class Reservation {
         this.spotName = spotName;
     }
 
-    // Getters and Setters
     public int getReservationId() {
         return reservationId;
     }

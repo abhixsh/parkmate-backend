@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -28,7 +29,7 @@ public class UserServlet extends HttpServlet {
 
     private void setCorsHeaders(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS"); 
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
         response.setHeader("Access-Control-Allow-Credentials", "true");
     }
@@ -38,6 +39,48 @@ public class UserServlet extends HttpServlet {
             throws ServletException, IOException {
         setCorsHeaders(response);
         response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        setCorsHeaders(response);
+        response.setContentType("application/json");
+
+        try {
+            String pathInfo = request.getPathInfo();
+
+            if (pathInfo != null && pathInfo.equals("/")) {
+                List<User> users = userDao.getAllUsers();
+                String usersJson = gson.toJson(users);
+                sendResponse(response, HttpServletResponse.SC_OK, usersJson);
+            } else {
+                String[] pathParts = pathInfo.split("/");
+                if (pathParts.length == 2) {
+                    int userId = Integer.parseInt(pathParts[1]);
+                    User user = userDao.getUserById(userId);
+                    if (user != null) {
+                        String userJson = gson.toJson(user);
+                        sendResponse(response, HttpServletResponse.SC_OK, userJson);
+                    } else {
+                        String errorJson = gson.toJson(new JsonResponse("User not found", false, null));
+                        sendResponse(response, HttpServletResponse.SC_NOT_FOUND, errorJson);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            String errorJson = gson.toJson(new JsonResponse("Failed to fetch users: " + e.getMessage(), false, null));
+            sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorJson);
+        }
+    }
+
+    private void sendResponse(HttpServletResponse response, int status, String jsonResponse) throws IOException {
+        response.setStatus(status);
+        PrintWriter out = response.getWriter();
+        out.print(jsonResponse);
+        out.flush();
     }
 
     @Override
@@ -55,11 +98,9 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    // Original registration logic moved to its own method
     private void handleRegistration(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Read JSON data from request
             BufferedReader reader = request.getReader();
             StringBuilder jsonBuilder = new StringBuilder();
             String line;
@@ -67,17 +108,14 @@ public class UserServlet extends HttpServlet {
                 jsonBuilder.append(line);
             }
 
-            // Parse JSON to User object
             User user = gson.fromJson(jsonBuilder.toString(), User.class);
 
-            // Validate user data
             if (!isValidUser(user)) {
                 String errorJson = gson.toJson(new JsonResponse("Invalid user data provided.", false, null));
                 sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, errorJson);
                 return;
             }
 
-            // Register user
             boolean success = userDao.registerUser(user);
 
             if (success) {
@@ -95,11 +133,9 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    // New login handler method
     private void handleLogin(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Read JSON data from request
             BufferedReader reader = request.getReader();
             StringBuilder jsonBuilder = new StringBuilder();
             String line;
@@ -107,21 +143,17 @@ public class UserServlet extends HttpServlet {
                 jsonBuilder.append(line);
             }
 
-            // Parse JSON to get login credentials
             JsonObject credentials = gson.fromJson(jsonBuilder.toString(), JsonObject.class);
             String email = credentials.get("email").getAsString();
             String password = credentials.get("password").getAsString();
 
-            // Validate login
             User user = userDao.validateLogin(email, password);
 
             if (user != null) {
-                // Create session
                 HttpSession session = request.getSession();
                 session.setAttribute("userId", user.getId());
                 session.setAttribute("userEmail", user.getEmail());
 
-                // Create JSON with user details
                 JsonObject userJson = new JsonObject();
                 userJson.addProperty("id", user.getId());
                 userJson.addProperty("fullName", user.getFullName());
@@ -146,14 +178,43 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    private void sendResponse(HttpServletResponse response, int status, String jsonResponse) throws IOException {
-        response.setStatus(status);
-        PrintWriter out = response.getWriter();
-        out.print(jsonResponse);
-        out.flush();
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        setCorsHeaders(response);
+        response.setContentType("application/json");
+
+        try {
+            String pathInfo = request.getPathInfo();
+            if (pathInfo != null) {
+                String[] pathParts = pathInfo.split("/");
+                if (pathParts.length == 2) {
+                    int userId = Integer.parseInt(pathParts[1]);
+                    boolean deleted = userDao.deleteUser(userId);
+
+                    if (deleted) {
+                        String successJson = gson.toJson(new JsonResponse("User deleted successfully.", true, userId));
+                        sendResponse(response, HttpServletResponse.SC_OK, successJson);
+                    } else {
+                        String errorJson = gson.toJson(new JsonResponse("Error deleting user.", false, null));
+                        sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorJson);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            String errorJson = gson.toJson(new JsonResponse("An error occurred while deleting the user: " + e.getMessage(), false, null));
+            sendResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorJson);
+        }
     }
 
-    // Updated JsonResponse class with userId
+    private boolean isValidUser(User user) {
+        return user != null
+                && user.getFullName() != null && !user.getFullName().trim().isEmpty()
+                && user.getEmail() != null && !user.getEmail().trim().isEmpty()
+                && user.getPassword() != null && !user.getPassword().trim().isEmpty();
+    }
+
     private static class JsonResponse {
 
         private String message;
@@ -165,19 +226,5 @@ public class UserServlet extends HttpServlet {
             this.success = success;
             this.userId = userId;
         }
-    }
-
-    private void sendErrorResponse(HttpServletResponse response, int status, String message) throws IOException {
-        response.setStatus(status);
-        PrintWriter out = response.getWriter();
-        out.write("{\"message\": \"" + message + "\"}");
-        out.flush();
-    }
-
-    private boolean isValidUser(User user) {
-        return user != null
-                && user.getFullName() != null && !user.getFullName().trim().isEmpty()
-                && user.getEmail() != null && !user.getEmail().trim().isEmpty()
-                && user.getPassword() != null && !user.getPassword().trim().isEmpty();
     }
 }

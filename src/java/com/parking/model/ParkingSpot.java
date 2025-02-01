@@ -8,7 +8,6 @@ public class ParkingSpot {
     private double hourlyRate;
     private boolean isAvailable;
 
-    // Constructors
     public ParkingSpot() {}
 
     public ParkingSpot(int id, String name, String location, String type, double hourlyRate, boolean isAvailable) {
@@ -20,7 +19,6 @@ public class ParkingSpot {
         this.isAvailable = isAvailable;
     }
 
-    // Getters and setters
     public int getId() {
         return id;
     }

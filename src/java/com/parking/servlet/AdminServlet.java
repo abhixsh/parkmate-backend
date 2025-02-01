@@ -47,11 +47,9 @@ public class AdminServlet extends HttpServlet {
 @Override
 protected void doPost(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
-    // Set CORS headers before proceeding with the POST request
     setCorsHeaders(response);
     response.setContentType("application/json");
 
-    // Your existing login handling logic
     String pathInfo = request.getPathInfo();
    
     if (pathInfo != null && pathInfo.equals("/login")) {
@@ -63,11 +61,9 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
 }
 
 
-    // Admin Registration
     private void handleRegistration(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Read JSON data from request
             BufferedReader reader = request.getReader();
             StringBuilder jsonBuilder = new StringBuilder();
             String line;
@@ -75,17 +71,14 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
                 jsonBuilder.append(line);
             }
 
-            // Parse JSON to Admin object
             Admin admin = gson.fromJson(jsonBuilder.toString(), Admin.class);
 
-            // Validate admin data
             if (!isValidAdmin(admin)) {
                 String errorJson = gson.toJson(new JsonResponse("Invalid admin data provided.", false, null));
                 sendResponse(response, HttpServletResponse.SC_BAD_REQUEST, errorJson);
                 return;
             }
 
-            // Register admin
             boolean success = adminDao.registerAdmin(admin);
 
             if (success) {
@@ -103,11 +96,9 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         }
     }
 
-    // Admin Login
     private void handleLogin(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Read JSON data from request
             BufferedReader reader = request.getReader();
             StringBuilder jsonBuilder = new StringBuilder();
             String line;
@@ -115,21 +106,17 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
                 jsonBuilder.append(line);
             }
 
-            // Parse JSON to get login credentials
             JsonObject credentials = gson.fromJson(jsonBuilder.toString(), JsonObject.class);
             String email = credentials.get("email").getAsString();
             String password = credentials.get("password").getAsString();
 
-            // Validate login
             Admin admin = adminDao.validateLogin(email, password);
 
             if (admin != null) {
-                // Create session
                 HttpSession session = request.getSession();
                 session.setAttribute("adminId", admin.getAdminId());
                 session.setAttribute("adminEmail", admin.getEmail());
 
-                // Create JSON with admin details
                 JsonObject adminJson = new JsonObject();
                 adminJson.addProperty("adminId", admin.getAdminId());
                 adminJson.addProperty("email", admin.getEmail());
@@ -160,7 +147,6 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         out.flush();
     }
 
-    // Updated JsonResponse class with adminId
     private static class JsonResponse {
 
         private String message;
@@ -174,7 +160,6 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         }
     }
 
-    // Helper method to validate Admin data
     private boolean isValidAdmin(Admin admin) {
         return admin != null
                 && admin.getEmail() != null && !admin.getEmail().trim().isEmpty()

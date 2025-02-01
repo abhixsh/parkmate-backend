@@ -11,13 +11,11 @@ public class UserDao {
 
     private Connection connection;
 
-    // Constructor: Initializes connection using DbConnector
     public UserDao() {
         DbConnector dbConnector = new DbConnector();
         this.connection = dbConnector.getConnection();
     }
 
-    // CREATE: Register a new user
     public boolean registerUser(User user) {
         String query = "INSERT INTO Users (fullName, email, phoneNumber, password) VALUES (?, ?, ?, ?)";
         try (Connection conn = new DbConnector().getConnection();
@@ -40,7 +38,6 @@ public class UserDao {
         }
     }
 
-    // READ: Get all users
     public List<User> getAllUsers() {
         String query = "SELECT * FROM Users";
         List<User> users = new ArrayList<>();
@@ -55,7 +52,6 @@ public class UserDao {
         return users;
     }
 
-    // READ: Get user by ID
     public User getUserById(int id) {
         String query = "SELECT * FROM Users WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -70,7 +66,6 @@ public class UserDao {
         return null;
     }
 
-    // READ: Get user by email
     public User getUserByEmail(String email) {
         String query = "SELECT * FROM Users WHERE email = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -85,7 +80,6 @@ public class UserDao {
         return null;
     }
 
-    // UPDATE: Update user details
     public boolean updateUser(User user) {
         String query = "UPDATE Users SET fullName = ?, email = ?, phoneNumber = ?, password = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -102,7 +96,6 @@ public class UserDao {
         return false;
     }
 
-    // DELETE: Remove a user
     public boolean deleteUser(int id) {
         String query = "DELETE FROM Users WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -115,12 +108,11 @@ public class UserDao {
         return false;
     }
 
-    // Add these methods to UserDao.java
     public User validateLogin(String email, String password) {
         String query = "SELECT * FROM Users WHERE email = ? AND password = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
-            stmt.setString(2, password);  // In production, use proper password hashing
+            stmt.setString(2, password);  
 
             ResultSet resultSet = stmt.executeQuery();
             if (resultSet.next()) {
@@ -132,7 +124,6 @@ public class UserDao {
         return null;
     }
 
-    // Helper method to extract a User object from a ResultSet
     private User extractUserFromResultSet(ResultSet resultSet) throws SQLException {
         User user = new User();
         user.setId(resultSet.getInt("id"));

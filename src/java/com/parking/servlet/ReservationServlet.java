@@ -56,7 +56,6 @@ public class ReservationServlet extends HttpServlet {
                 response.getWriter().write(gson.toJson("Failed to fetch reservations by email"));
             }
         } else if (pathInfo == null || pathInfo.equals("/")) {
-            // Fetch all reservations
             try {
                 response.getWriter().write(gson.toJson(reservationDao.getAllReservations()));
             } catch (Exception e) {

@@ -15,7 +15,6 @@ public class ParkingSpotDao {
         this.connection = dbConnector.getConnection();
     }
 
-    // Add a new parking spot
     public boolean addParkingSpot(ParkingSpot spot) {
         String query = "INSERT INTO ParkingSpots (name, location, type, hourlyRate, isAvailable) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -33,7 +32,6 @@ public class ParkingSpotDao {
         }
     }
 
-    // Fetch all parking spots
     public List<ParkingSpot> getAllParkingSpots() {
         List<ParkingSpot> spots = new ArrayList<>();
         String query = "SELECT * FROM ParkingSpots";
@@ -103,5 +101,25 @@ public class ParkingSpotDao {
             e.printStackTrace();
             return false;
         }
+    }
+    public List<ParkingSpot> getAvailableParkingSpots() {
+        List<ParkingSpot> spots = new ArrayList<>();
+        String query = "SELECT * FROM ParkingSpots WHERE isAvailable = true";  // Query to fetch available spots
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet resultSet = stmt.executeQuery()) {
+            while (resultSet.next()) {
+                spots.add(new ParkingSpot(
+                    resultSet.getInt("id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("location"),
+                    resultSet.getString("type"),
+                    resultSet.getDouble("hourlyRate"),
+                    resultSet.getBoolean("isAvailable")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return spots;
     }
 }

@@ -9,9 +9,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/parkingspot/*")
 public class ParkingSpotServlet extends HttpServlet {
+
     private ParkingSpotDao parkingSpotDao;
     private Gson gson = new Gson();
 
@@ -20,7 +22,6 @@ public class ParkingSpotServlet extends HttpServlet {
         parkingSpotDao = new ParkingSpotDao();
     }
 
-    // Method to set CORS Headers
     private void setCorsHeaders(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -41,15 +42,21 @@ public class ParkingSpotServlet extends HttpServlet {
         response.setContentType("application/json");
 
         if (pathInfo == null || pathInfo.equals("/")) {
-            // Fetch all parking spots
             try {
                 response.getWriter().write(gson.toJson(parkingSpotDao.getAllParkingSpots()));
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write(gson.toJson("Failed to fetch parking spots"));
             }
+        } else if (pathInfo.equals("/available")) { 
+            try {
+                List<ParkingSpot> availableSpots = parkingSpotDao.getAvailableParkingSpots();
+                response.getWriter().write(gson.toJson(availableSpots));
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write(gson.toJson("Failed to fetch available parking spots"));
+            }
         } else {
-            // Fetch a specific parking spot by ID
             try {
                 int id = Integer.parseInt(pathInfo.substring(1));
                 ParkingSpot spot = parkingSpotDao.getParkingSpotById(id);
@@ -70,7 +77,6 @@ public class ParkingSpotServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         setCorsHeaders(response);
         try {
-            // Parse request body to create a new parking spot
             ParkingSpot spot = gson.fromJson(request.getReader(), ParkingSpot.class);
             boolean success = parkingSpotDao.addParkingSpot(spot);
             response.setContentType("application/json");
@@ -86,7 +92,6 @@ public class ParkingSpotServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         setCorsHeaders(response);
         try {
-            // Parse the parking spot id from the path
             int id = Integer.parseInt(request.getPathInfo().substring(1));
             ParkingSpot spot = gson.fromJson(request.getReader(), ParkingSpot.class);
             spot.setId(id);

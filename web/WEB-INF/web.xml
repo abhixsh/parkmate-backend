@@ -46,7 +46,6 @@
         <url-pattern>/parkingSpot/*</url-pattern>
     </servlet-mapping>
 
-    <!-- Session Timeout Configuration -->
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>

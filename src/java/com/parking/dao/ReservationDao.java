@@ -15,7 +15,6 @@ public class ReservationDao {
         this.connection = dbConnector.getConnection();
     }
 
-    // CREATE: Add a new reservation
     public boolean addReservation(Reservation reservation) {
         String query = "INSERT INTO reservations (fullName, email, vehicleType, vehiclePlateNumber, reservationDate, startTime, endTime, spotName) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -23,9 +22,9 @@ public class ReservationDao {
             stmt.setString(2, reservation.getEmail());
             stmt.setString(3, reservation.getVehicleType());
             stmt.setString(4, reservation.getVehiclePlateNumber());
-            stmt.setLong(5, reservation.getReservationDate());  // Changed from setInt to setLong
-            stmt.setLong(6, reservation.getStartTime());        // Changed from setInt to setLong
-            stmt.setLong(7, reservation.getEndTime());          // Changed from setInt to setLong
+            stmt.setLong(5, reservation.getReservationDate());  
+            stmt.setLong(6, reservation.getStartTime());        
+            stmt.setLong(7, reservation.getEndTime());          
             stmt.setString(8, reservation.getSpotName());
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -35,7 +34,6 @@ public class ReservationDao {
         }
     }
 
-    // READ: Get a reservation by ID
     public Reservation getReservationById(int id) {
         String query = "SELECT * FROM reservations WHERE reservationID = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -48,9 +46,9 @@ public class ReservationDao {
                     resultSet.getString("email"),
                     resultSet.getString("vehicleType"),
                     resultSet.getString("vehiclePlateNumber"),
-                    resultSet.getLong("reservationDate"),  // Changed from getInt to getLong
-                    resultSet.getLong("startTime"),        // Changed from getInt to getLong
-                    resultSet.getLong("endTime"),          // Changed from getInt to getLong
+                    resultSet.getLong("reservationDate"),  
+                    resultSet.getLong("startTime"),        
+                    resultSet.getLong("endTime"),         
                     resultSet.getString("spotName")
                 );
             }
@@ -60,7 +58,6 @@ public class ReservationDao {
         return null;
     }
 
-    // READ: Get all reservations
     public List<Reservation> getAllReservations() {
         List<Reservation> reservations = new ArrayList<>();
         String query = "SELECT * FROM reservations";
@@ -73,9 +70,9 @@ public class ReservationDao {
                     resultSet.getString("email"),
                     resultSet.getString("vehicleType"),
                     resultSet.getString("vehiclePlateNumber"),
-                    resultSet.getLong("reservationDate"),  // Changed from getInt to getLong
-                    resultSet.getLong("startTime"),        // Changed from getInt to getLong
-                    resultSet.getLong("endTime"),          // Changed from getInt to getLong
+                    resultSet.getLong("reservationDate"),  
+                    resultSet.getLong("startTime"),        
+                    resultSet.getLong("endTime"),         
                     resultSet.getString("spotName")
                 ));
             }
@@ -93,8 +90,8 @@ public class ReservationDao {
             stmt.setString(2, reservation.getEmail());
             stmt.setString(3, reservation.getVehicleType());
             stmt.setString(4, reservation.getVehiclePlateNumber());
-            stmt.setLong(5, reservation.getStartTime());  // Changed from setInt to setLong
-            stmt.setLong(6, reservation.getEndTime());    // Changed from setInt to setLong
+            stmt.setLong(5, reservation.getStartTime());  
+            stmt.setLong(6, reservation.getEndTime());    
             stmt.setString(7, reservation.getSpotName());
             stmt.setInt(8, reservation.getReservationId());
             int rowsAffected = stmt.executeUpdate();
@@ -105,7 +102,6 @@ public class ReservationDao {
         return false;
     }
 
-    // DELETE: Delete a reservation by ID
     public boolean deleteReservation(int id) {
         String query = "DELETE FROM reservations WHERE reservationID = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -117,7 +113,6 @@ public class ReservationDao {
         }
         return false;
     }
-    // READ: Get reservations by email
 public List<Reservation> getReservationsByEmail(String email) {
     List<Reservation> reservations = new ArrayList<>();
     String query = "SELECT * FROM reservations WHERE email = ?";

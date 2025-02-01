@@ -7,7 +7,6 @@ public class Admin {
     private String password;
     private String role;
 
-    // Default constructor
     public Admin() {
         this.adminId = 0;
         this.email = "";
@@ -15,7 +14,6 @@ public class Admin {
         this.role = "";
     }
 
-    // Constructor with parameters
     public Admin(int adminId, String email, String password, String role) {
         this.adminId = adminId;
         this.email = email;
@@ -23,7 +21,6 @@ public class Admin {
         this.role = role;
     }
 
-    // Getters and Setters
     public int getAdminId() {
         return adminId;
     }
