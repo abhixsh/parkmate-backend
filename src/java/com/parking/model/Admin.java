@@ -1,38 +1,35 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.parking.model;
 
-/**
- *
- * @author Abishek
- */
 public class Admin {
 
-    private int id;
-    private String fullName;
+    private int adminId;
     private String email;
-    private String phoneNumber;
-    private String username;
     private String password;
     private String role;
 
-    public int getId() {
-        return id;
+    // Default constructor
+    public Admin() {
+        this.adminId = 0;
+        this.email = "";
+        this.password = "";
+        this.role = "";
     }
 
-    public void setId(int id) {
-        this.id = id;
+    // Constructor with parameters
+    public Admin(int adminId, String email, String password, String role) {
+        this.adminId = adminId;
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
-    public String getFullName() {
-        return fullName;
+    // Getters and Setters
+    public int getAdminId() {
+        return adminId;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setAdminId(int adminId) {
+        this.adminId = adminId;
     }
 
     public String getEmail() {
@@ -41,22 +38,6 @@ public class Admin {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {
@@ -74,7 +55,4 @@ public class Admin {
     public void setRole(String role) {
         this.role = role;
     }
-    
-    
-
 }
