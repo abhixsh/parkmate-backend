@@ -27,12 +27,14 @@ public class AdminServlet extends HttpServlet {
         gson = new Gson();
     }
 
-    private void setCorsHeaders(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-    }
+   private void setCorsHeaders(HttpServletResponse response) {
+    response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173"); // Allow frontend origin
+    response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept"); // Add Content-Type here
+    response.setHeader("Access-Control-Allow-Credentials", "true");
+    response.setHeader("Access-Control-Max-Age", "3600");
+}
+
 
     @Override
     protected void doOptions(HttpServletRequest request, HttpServletResponse response)
@@ -41,20 +43,25 @@ public class AdminServlet extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        setCorsHeaders(response);
-        response.setContentType("application/json");
 
-        String pathInfo = request.getPathInfo();
+@Override
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    // Set CORS headers before proceeding with the POST request
+    setCorsHeaders(response);
+    response.setContentType("application/json");
 
-        if (pathInfo != null && pathInfo.equals("/login")) {
-            handleLogin(request, response);
-        } else {
-            handleRegistration(request, response);
-        }
+    // Your existing login handling logic
+    String pathInfo = request.getPathInfo();
+   
+    if (pathInfo != null && pathInfo.equals("/login")) {
+        
+        handleLogin(request, response);
+    } else {
+        handleRegistration(request, response);
     }
+}
+
 
     // Admin Registration
     private void handleRegistration(HttpServletRequest request, HttpServletResponse response)
